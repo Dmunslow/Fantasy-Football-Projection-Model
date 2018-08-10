@@ -4,8 +4,6 @@ Created on Sat Aug  4 22:05:13 2018
 
 @author: Duncan
 """
-
-import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 
@@ -46,29 +44,7 @@ def get_snap_count_page (pos, week, year):
 
 
 
-
-
- # snap counts page url
-url = "https://www.footballoutsiders.com/stats/snapcounts"
-
-driver = webdriver.Chrome("E:\Python Projects\chromedriver.exe")
-driver.get(url)
-
-
-## select WR position
-s1 = Select(driver.find_element_by_name("pos"))
-s1.select_by_visible_text("WR")
-
-## select week 1
-s2 = Select(driver.find_element_by_name("week"))
-s2.select_by_visible_text("6")
-
-## select year
-s3 = Select(driver.find_element_by_name("year"))
-s3.select_by_visible_text("2015")
-
-#submit data
-driver.find_element_by_name("Submit").click()
+get_snap_count_page("WR", "6", "2017")
 
 
 
