@@ -9,7 +9,7 @@ pbp_dt <- setDT(pbp_2017)
 
 
 snap_counts <- pbp_2017[!is.na(OffenseTeam),
-                        .(total_snaps = .N,
+                        .(total_Off_snaps = .N,
                           total_pass_plays = sum(ifelse(PlayType == "PASS", 1, 0), na.rm = T),
                           total_run_plays = sum(ifelse(PlayType == "RUSH", 1, 0), na.rm = T)
                           ),

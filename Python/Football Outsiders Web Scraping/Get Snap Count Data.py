@@ -18,7 +18,7 @@ global driver
 positions = ["RB", "WR", "TE"]
 
 #initialize weeks data frame for regular season weeks only
-weeks = list(np.arange(1, 17, 1))
+weeks = list(np.arange(1, 18, 1))
 
 seasons = ["2016","2017"]
 
