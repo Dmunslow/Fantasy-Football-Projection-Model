@@ -82,21 +82,17 @@ rush_rec_stats <- pbp_dt[PlayType %in% c("Pass", "Run") & Pos %in% c('WR', 'TE',
                             rec_yards = sum(YardsGained * PassAttempt),
                             rec_touchdowns = sum(Touchdown * PassAttempt),
                             rec_two_pt_conv = as.integer(sum( ifelse(TwoPointConv == "Success",1,0) * PassAttempt)),
+                            rec_fumble = as.integer(sum(ifelse(Fumble == 1 & RecFumbTeam != posteam,1,0) * PassAttempt)),
                             
                             rush_att = sum(as.integer(RushAttempt)),
                             rush_yards = sum(YardsGained * RushAttempt),
                             rush_touchdowns = sum(Touchdown * RushAttempt),
                             rush_two_pt_conv = as.integer(sum( ifelse(TwoPointConv == "Success",1,0) * RushAttempt)),
-                            fumble = as.integer(sum(ifelse(Fumble == 1 & RecFumbTeam != posteam,1,0)))
+                            rush_fumble = as.integer(sum(ifelse(Fumble == 1 & RecFumbTeam != posteam,1,0) * RushAttempt))
                             
                           ),
                           by = .(Season, HomeTeam, AwayTeam, Date, GSIS_ID, 
                                  posteam, Pos)]
-
-# REPLACE NAS WITH 0
-rush_rec_stats$rush_two_pt_conv[is.na(rush_rec_stats$rush_two_pt_conv)] <- 0
-rush_rec_stats$rec_two_pt_conv[is.na(rush_rec_stats$rec_two_pt_conv)] <- 0
-rush_rec_stats$fumble[is.na(rush_rec_stats$fumble)] <- 0
 
 
 ## GET KICKING DATA ------------------------------------------------------------
@@ -197,7 +193,7 @@ full_stats$player_name <-  roster_info_all$name[match(full_stats$GSIS_ID, roster
 
 # Rearrange Columns
 
-full_stats <- full_stats[, c(5,19,6, 1:4, 7:18)]
+full_stats <- full_stats[, c(5,20,6, 1:4, 7:19)]
 
 ## Rename and format columns
 column_names <- colnames(full_stats)
@@ -209,7 +205,64 @@ column_names[6] <- "AWAY_TEAM"
 column_names <- toupper(column_names)
 
 ## Assign to full stats 
-
 colnames(full_stats) <- column_names
+
+
+
+## CREATE DK SCORE ------------------------------------------------------------
+
+full_stats_dt <- setDT(full_stats)
+
+dk_points <-full_stats_dt[  ,
+                                .(  DK_REC_POINTS = REC_TOUCHDOWNS * 6 +
+                                                        REC_YARDS * .1 +
+                                                        ifelse(REC_YARDS >= 100, 3, 0) +
+                                                        RECEPTIONS +
+                                                        REC_TWO_PT_CONV * 2 +
+                                                        REC_FUMBLE * -1,
+                                    
+                                    DK_RUSH_POINTS = RUSH_TWO_PT_CONV * 6 + 
+                                                        RUSH_YARDS * .1 +
+                                                        ifelse(RUSH_YARDS >= 100, 3, 0) +
+                                                        REC_TWO_PT_CONV * 2 +
+                                                        RUSH_FUMBLE * -1,
+                                    
+                                    DK_TOTAL_POINTS = RUSH_TWO_PT_CONV * 6 + 
+                                                        RUSH_YARDS * .1 +
+                                                        REC_TOUCHDOWNS * 6 +
+                                                        REC_YARDS * .1 +
+                                                        ifelse(RUSH_YARDS >= 100, 3, 0) +
+                                                        ifelse(REC_YARDS >= 100, 3, 0) +
+                                                        RECEPTIONS +
+                                                        RETURN_TDS * 6 +
+                                                        RUSH_TWO_PT_CONV * 2 +
+                                                        REC_TWO_PT_CONV * 2 +
+                                                        RUSH_FUMBLE * -1 +
+                                                        REC_FUMBLE * -1 
+                                    ),
+                                
+                                by = .(GSIS_ID, PLAYER_NAME, PLAYER_TEAM, SEASON,
+                                       HOME_TEAM, AWAY_TEAM, DATE, POS)
+                              ]
+
+
+## JOIN COLUMNS
+setkeyv(full_stats_dt, colnames(full_stats_dt)[1:8])
+setkeyv(dk_points, colnames(dk_points)[1:8])
+
+
+FINAL_STATS <- full_stats[dk_points]
+
+
+
+# CREATE NEW SQL TABLE AND INSERT
+
+db <- odbcConnect("NFLFFDB")
+
+
+sqlSave(db, FINAL_STATS, "DK_POINTS", append = T, rownames = F)
+
+
+
 
 

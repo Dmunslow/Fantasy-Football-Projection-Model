@@ -20,7 +20,7 @@ positions = ["RB", "WR", "TE"]
 #initialize weeks data frame for regular season weeks only
 weeks = list(np.arange(1, 18, 1))
 
-seasons = ["2016","2017"]
+seasons = ["2012", "2013", "2014", "2015","2016","2017"]
 
  # snap counts page url
 url = "https://www.footballoutsiders.com/stats/snapcounts"
@@ -97,7 +97,6 @@ for p in positions :
 col_names = master_df.columns.values
 col_names = list(map(str.strip, col_names))
 col_names = list(map(str.upper, col_names))
-col_names = list(map(str.replace(' ', '_'), col_names))
 col_names = [ x.replace(' ', '_') for x in col_names ]
 
 #assign col names to master_df
@@ -113,5 +112,5 @@ master_df["DEF_SNAP_PCT"] = '.' + master_df["DEF_SNAP_PCT"].astype(str)
 master_df["ST_SNAP_PCT"] = '.' + master_df["ST_SNAP_PCT"].astype(str)       
 
 ## save file as CSV
-master_df.to_csv('NFL Snap Counts - WR - RB - TE - 2016-2017.csv', index = False, header = True)
+master_df.to_csv('NFL Snap Counts - WR - RB - TE - 2012-2017.csv', index = False, header = True)
 
