@@ -255,10 +255,15 @@ FINAL_STATS <- full_stats[dk_points]
 
 
 
+FINAL_STATS_SUB <- FINAL_STATS[SEASON < 2016]
+
+
 # CREATE NEW SQL TABLE AND INSERT
 
 db <- odbcConnect("NFLFFDB")
 
+
+sqlSave(db, FINAL_STATS_SUB, "DK_POINTS_TEMP", append = T, rownames = F)
 
 sqlSave(db, FINAL_STATS, "DK_POINTS", append = T, rownames = F)
 

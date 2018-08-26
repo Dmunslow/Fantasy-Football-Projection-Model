@@ -47,7 +47,6 @@ def get_snap_count_page (pos, week, year):
     driver.find_element_by_name("Submit").click()
     return;
 
-
 #initialize DF
 master_df = pd.DataFrame([])
 
