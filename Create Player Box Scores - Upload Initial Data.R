@@ -1,8 +1,4 @@
-library(RODBC)
-library(nflscrapR)
-library(data.table)
-
-db <- odbcConnect("NFLFFDB")
+ 
 
 ## test read in data
 

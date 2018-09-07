@@ -133,11 +133,10 @@ master_df["OPPONENT"] = master_df["OPPONENT"].str.replace('LARM', 'LAR')
 master_df["OPPONENT"] = master_df["OPPONENT"].str.replace('LACH', 'LAC')
 
 
+master_df.to_csv('NFL All Passing Targets - WR - RB - TE - 2016-2017.csv', index = False, header = True)
 
 
-
-
-
+master_df.to_csv('FBO NFL Weekly DVOA by Team - 2008-2017.csv', index = False, header = True)
 
 
 
