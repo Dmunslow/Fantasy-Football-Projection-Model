@@ -1,0 +1,34 @@
+
+
+
+test <- fread("H:/Fraud/Operations Analysts/Data Scientists/Duncan/reg_pbp_2019.csv")
+
+
+
+game_json <- tryCatch(RJSONIO::fromJSON(RCurl::getURL("http://www.nfl.com/liveupdate/game-center/2019090500/2019090500_gtd.json", encoding = "gzip")),
+                      error = function(cond) { 
+                        message("Connection to NFL.com disrupted, please re-run code.")
+                        message(paste("Here is the game's url:", "http://www.nfl.com/liveupdate/game-center/2019090500/2019090500_gtd.json"))
+                        message("Here's the original error message:")
+                        message(cond)
+                        # Just return NA in case of error
+                        return(NA)
+                      }
+)
+
+
+create_game_json_url <- function(game_id) {
+  
+  # First check to make sure that the first six digits of the game id are at
+  # least 200904 (meaning they're at least from the 2009 season and have data
+  # from the NFL API):
+  assertthat::assert_that(as.numeric(stringr::str_sub(as.character(game_id), 1, 6)) > 200904,
+                          msg = "You entered an invalid game id! JSON urls are supported starting with the 2009 season.")
+  
+  # Paste together the proper location of the JSON data
+  paste0("http://www.nfl.com/liveupdate/game-center/", game_id, "/",
+         game_id, "_gtd.json")
+}
+
+
+create_game_json_url("2019090500")
